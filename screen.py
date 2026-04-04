@@ -18,7 +18,7 @@ SWITCH_PINS = {
 
 MAX_BALLS = 9
 HIGH_SCORE_FILE = "highscores.json"
-SCREEN_W, SCREEN_H = 800, 480   # typical Pi touchscreen / HDMI
+SCREEN_W, SCREEN_H = 800*3, 480*3   # typical Pi touchscreen / HDMI
 
 # ── Colors ────────────────────────────────────────────────────────────────────
 
