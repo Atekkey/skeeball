@@ -78,6 +78,7 @@ class SkeeBall:
         self.high_scores = load_scores()
         self.state = "playing"   # playing | game_over
         self.flash = None        # (points, timestamp)
+        self.last_hit = None     # points value of last hit (for lighting up board)
 
         # GPIO
         if PI:
@@ -106,6 +107,7 @@ class SkeeBall:
         self.balls_thrown += 1
         self.history.append(pts)
         self.flash = (pts, pygame.time.get_ticks())
+        self.last_hit = pts
         if self.balls_thrown >= MAX_BALLS:
             self._end_game()
 
@@ -122,12 +124,49 @@ class SkeeBall:
         self.balls_thrown = 0
         self.history = []
         self.flash = None
+        self.last_hit = None
         self.state = "playing"
 
     # ── Drawing ───────────────────────────────────────────────────────────────
 
     def _draw_rounded_rect(self, surf, color, rect, radius=12):
         pygame.draw.rect(surf, color, rect, border_radius=radius)
+
+    def _draw_skeeball_board(self, cx, cy, size):
+        """Draw a skeeball target board centered at (cx, cy) with given size."""
+        scr = self.screen
+
+        # Ring definitions: (points, radius_ratio, color_dim, color_lit)
+        rings = [
+            (10, 1.0,   (40, 50, 45),   (60, 180, 100)),    # outer - 10 pts
+            (20, 0.75,  (50, 45, 50),   (140, 90, 180)),    # 20 pts
+            (30, 0.50,  (50, 50, 60),   (80, 140, 200)),    # 30 pts
+            (50, 0.30,  (60, 50, 45),   (200, 150, 60)),    # 50 pts
+            (100, 0.15, (70, 45, 45),   (220, 80, 80)),     # center - 100 pts
+        ]
+
+        # Draw rings from outer to inner
+        for pts, ratio, col_dim, col_lit in rings:
+            r = int(size * ratio)
+            col = col_lit if self.last_hit == pts else col_dim
+            pygame.draw.circle(scr, col, (cx, cy), r)
+            # Draw ring border
+            pygame.draw.circle(scr, DARK_GRAY, (cx, cy), r, 3)
+
+        # Draw point labels on rings
+        label_font = self.font_small
+        label_positions = [
+            (100, 0.075),   # center
+            (50, 0.225),    # 50 ring
+            (30, 0.40),     # 30 ring
+            (20, 0.625),    # 20 ring
+            (10, 0.875),    # 10 ring (outer)
+        ]
+        for pts, ratio in label_positions:
+            label = label_font.render(str(pts), True, WHITE if self.last_hit == pts else GRAY)
+            lx = cx - label.get_width() // 2
+            ly = cy - int(size * ratio) - label.get_height() // 2
+            scr.blit(label, (lx, ly))
 
     def _draw_playing(self):
         scr = self.screen
@@ -153,7 +192,13 @@ class SkeeBall:
                 alpha = max(0, 255 - int(255 * age / 1000))
                 fsuf = self.font_large.render(f"+{pts}", True, GREEN)
                 fsuf.set_alpha(alpha)
-                scr.blit(fsuf, (20 + panel_w // 2 - fsuf.get_width() // 2, 340))
+                scr.blit(fsuf, (20 + panel_w // 2 - fsuf.get_width() // 2, 320))
+
+        # Skeeball board graphic
+        board_cx = 20 + panel_w // 2
+        board_cy = H // 2 + 80
+        board_size = min(panel_w - 100, H - 500) // 2
+        self._draw_skeeball_board(board_cx, board_cy, board_size)
 
         # Balls remaining
         ball_y = H - 180
