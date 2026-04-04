@@ -1,9 +1,11 @@
-PI = 1
+import sys
+import time
+
+PI = "-PI" in sys.argv
+
 if PI:
     import RPi.GPIO as GPIO
     GPIO.setmode(GPIO.BCM)
-
-import time
 
 
 
@@ -24,14 +26,15 @@ def ball_scored(channel):
 
 
 # SETUP
-for pin in SWITCH_PINS:
-    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.add_event_detect(
-        pin,
-        GPIO.FALLING,        # FALLING = pin goes LOW (switch closes)
-        callback=ball_scored,
-        bouncetime=300       # 300ms debounce — ignores rapid re-triggers
-    )
+if PI:
+    for pin in SWITCH_PINS:
+        GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.add_event_detect(
+            pin,
+            GPIO.FALLING,        # FALLING = pin goes LOW (switch closes)
+            callback=ball_scored,
+            bouncetime=300       # 300ms debounce — ignores rapid re-triggers
+        )
 
 
 
@@ -42,4 +45,5 @@ try:
         time.sleep(1)
 except KeyboardInterrupt:
     print(f"Game over! Final score: {score}")
-    GPIO.cleanup()
+    if PI:
+        GPIO.cleanup()
