@@ -62,7 +62,7 @@ def save_scores(scores):
 class SkeeBall:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((SCREEN_W, SCREEN_H))
+        self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
         pygame.display.set_caption("Skeeball")
 
         self.font_huge  = pygame.font.SysFont("dejavusans", 96, bold=False)
