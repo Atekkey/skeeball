@@ -163,8 +163,9 @@ class SkeeBall:
         ball_spacing = 20
         total_balls_w = MAX_BALLS * (ball_r * 2) + (MAX_BALLS - 1) * ball_spacing
         bx = 20 + panel_w // 2 - total_balls_w // 2 + ball_r
+        balls_remaining = MAX_BALLS - self.balls_thrown
         for i in range(MAX_BALLS):
-            col = ACCENT if i < self.balls_thrown else DARK_GRAY
+            col = ACCENT if i < balls_remaining else DARK_GRAY
             pygame.draw.circle(scr, col, (bx + i * (ball_r * 2 + ball_spacing), ball_y + ball_r), ball_r)
 
         # Right panel — high scores (skinny)
