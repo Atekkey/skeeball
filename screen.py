@@ -197,10 +197,10 @@ class SkeeBall:
                 scr.blit(fsuf, (20 + panel_w // 2 - fsuf.get_width() // 2, 320))
 
         # # Skeeball board graphic
-        # board_cx = 20 + panel_w // 2
-        # board_cy = H // 2 + 80
-        # board_size = min(panel_w - 100, H - 500) // 2
-        # self._draw_skeeball_board(board_cx, board_cy, board_size)
+        board_cx = 20 + panel_w // 2
+        board_cy = H // 2 + 80
+        board_size = min(panel_w - 100, H - 500) // 2
+        self._draw_skeeball_board(board_cx, board_cy, board_size)
 
         # Balls remaining
         ball_y = H - 180
