@@ -4,3 +4,5 @@ Password: Those Who Know
 
 EDIT STARTUP:
 sudo nano /etc/rc.local
+
+python3 -m pip install -U pygame==2.6.0
