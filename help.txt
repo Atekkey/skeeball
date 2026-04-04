@@ -1,0 +1,6 @@
+Log In:
+ssh triangle@triangle.local
+Password: Those Who Know
+
+EDIT STARTUP:
+sudo nano /etc/rc.local
