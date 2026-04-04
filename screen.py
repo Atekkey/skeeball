@@ -165,28 +165,26 @@ class SkeeBall:
             col = ACCENT if i < self.balls_thrown else DARK_GRAY
             pygame.draw.circle(scr, col, (bx + i * (ball_r * 2 + 6), ball_y + ball_r), ball_r)
 
-        # Right panel — high scores
-        rx = panel_w + 40
-        rw = W - rx - 20
+        # Right panel — high scores (skinny)
+        rw = 180
+        rx = W - rw - 20
         self._draw_rounded_rect(scr, SURFACE, (rx, 20, rw, H - 40), 16)
 
         hs_title = self.font_small.render("HIGH SCORES", True, GRAY)
         scr.blit(hs_title, (rx + rw // 2 - hs_title.get_width() // 2, 38))
 
-        pygame.draw.line(scr, DARK_GRAY, (rx + 16, 70), (rx + rw - 16, 70), 1)
+        pygame.draw.line(scr, DARK_GRAY, (rx + 12, 70), (rx + rw - 12, 70), 1)
 
         for i, entry in enumerate(self.high_scores[:7]):
             ey = 84 + i * 48
             rank_col = GOLD if i == 0 else (GRAY if i > 2 else WHITE)
-            rank_s = self.font_small.render(f"{i+1}", True, rank_col)
-            name_s = self.font_med.render(entry["name"][:14], True, WHITE)
+            rank_s = self.font_small.render(f"{i+1}.", True, rank_col)
             score_s = self.font_med.render(str(entry["score"]), True, ACCENT if i == 0 else WHITE)
-            scr.blit(rank_s, (rx + 16, ey + 4))
-            scr.blit(name_s, (rx + 42, ey))
-            scr.blit(score_s, (rx + rw - 16 - score_s.get_width(), ey))
+            scr.blit(rank_s, (rx + 12, ey + 4))
+            scr.blit(score_s, (rx + rw - 12 - score_s.get_width(), ey))
 
         if not self.high_scores:
-            empty = self.font_small.render("No scores yet", True, GRAY)
+            empty = self.font_small.render("No scores", True, GRAY)
             scr.blit(empty, (rx + rw // 2 - empty.get_width() // 2, 120))
 
     def _draw_game_over(self):
