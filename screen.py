@@ -63,12 +63,13 @@ class SkeeBall:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+        self.W, self.H = self.screen.get_size()
         pygame.display.set_caption("Skeeball")
 
-        self.font_huge  = pygame.font.SysFont("dejavusans", 96, bold=False)
-        self.font_large = pygame.font.SysFont("dejavusans", 48, bold=False)
-        self.font_med   = pygame.font.SysFont("dejavusans", 30, bold=False)
-        self.font_small = pygame.font.SysFont("dejavusans", 22, bold=False)
+        self.font_huge  = pygame.font.SysFont("dejavusans", 180, bold=False)
+        self.font_large = pygame.font.SysFont("dejavusans", 90, bold=False)
+        self.font_med   = pygame.font.SysFont("dejavusans", 50, bold=False)
+        self.font_small = pygame.font.SysFont("dejavusans", 36, bold=False)
 
         self.clock = pygame.time.Clock()
         self.score = 0
@@ -130,19 +131,19 @@ class SkeeBall:
 
     def _draw_playing(self):
         scr = self.screen
-        W, H = SCREEN_W, SCREEN_H
+        W, H = self.W, self.H
 
         # Left panel — score
-        panel_w = 380
+        panel_w = W - 300
         self._draw_rounded_rect(scr, SURFACE, (20, 20, panel_w, H - 40), 16)
 
         # Score label
         lbl = self.font_small.render("SCORE", True, GRAY)
-        scr.blit(lbl, (20 + panel_w // 2 - lbl.get_width() // 2, 50))
+        scr.blit(lbl, (20 + panel_w // 2 - lbl.get_width() // 2, 60))
 
         # Score number
         score_surf = self.font_huge.render(str(self.score), True, WHITE)
-        scr.blit(score_surf, (20 + panel_w // 2 - score_surf.get_width() // 2, 80))
+        scr.blit(score_surf, (20 + panel_w // 2 - score_surf.get_width() // 2, 120))
 
         # Flash "+pts"
         if self.flash:
@@ -152,44 +153,45 @@ class SkeeBall:
                 alpha = max(0, 255 - int(255 * age / 1000))
                 fsuf = self.font_large.render(f"+{pts}", True, GREEN)
                 fsuf.set_alpha(alpha)
-                scr.blit(fsuf, (20 + panel_w // 2 - fsuf.get_width() // 2, 190))
+                scr.blit(fsuf, (20 + panel_w // 2 - fsuf.get_width() // 2, 340))
 
         # Balls remaining
-        ball_y = 270
+        ball_y = H - 180
         ball_label = self.font_small.render("BALLS", True, GRAY)
-        scr.blit(ball_label, (20 + panel_w // 2 - ball_label.get_width() // 2, ball_y - 28))
-        ball_r = 14
-        total_balls_w = MAX_BALLS * (ball_r * 2 + 6) - 6
+        scr.blit(ball_label, (20 + panel_w // 2 - ball_label.get_width() // 2, ball_y - 50))
+        ball_r = 35
+        ball_spacing = 20
+        total_balls_w = MAX_BALLS * (ball_r * 2) + (MAX_BALLS - 1) * ball_spacing
         bx = 20 + panel_w // 2 - total_balls_w // 2 + ball_r
         for i in range(MAX_BALLS):
             col = ACCENT if i < self.balls_thrown else DARK_GRAY
-            pygame.draw.circle(scr, col, (bx + i * (ball_r * 2 + 6), ball_y + ball_r), ball_r)
+            pygame.draw.circle(scr, col, (bx + i * (ball_r * 2 + ball_spacing), ball_y + ball_r), ball_r)
 
         # Right panel — high scores (skinny)
-        rw = 180
+        rw = 260
         rx = W - rw - 20
         self._draw_rounded_rect(scr, SURFACE, (rx, 20, rw, H - 40), 16)
 
         hs_title = self.font_small.render("HIGH SCORES", True, GRAY)
-        scr.blit(hs_title, (rx + rw // 2 - hs_title.get_width() // 2, 38))
+        scr.blit(hs_title, (rx + rw // 2 - hs_title.get_width() // 2, 50))
 
-        pygame.draw.line(scr, DARK_GRAY, (rx + 12, 70), (rx + rw - 12, 70), 1)
+        pygame.draw.line(scr, DARK_GRAY, (rx + 16, 100), (rx + rw - 16, 100), 1)
 
         for i, entry in enumerate(self.high_scores[:7]):
-            ey = 84 + i * 48
+            ey = 120 + i * 70
             rank_col = GOLD if i == 0 else (GRAY if i > 2 else WHITE)
             rank_s = self.font_small.render(f"{i+1}.", True, rank_col)
             score_s = self.font_med.render(str(entry["score"]), True, ACCENT if i == 0 else WHITE)
-            scr.blit(rank_s, (rx + 12, ey + 4))
-            scr.blit(score_s, (rx + rw - 12 - score_s.get_width(), ey))
+            scr.blit(rank_s, (rx + 16, ey + 4))
+            scr.blit(score_s, (rx + rw - 16 - score_s.get_width(), ey))
 
         if not self.high_scores:
             empty = self.font_small.render("No scores", True, GRAY)
-            scr.blit(empty, (rx + rw // 2 - empty.get_width() // 2, 120))
+            scr.blit(empty, (rx + rw // 2 - empty.get_width() // 2, 180))
 
     def _draw_game_over(self):
         scr = self.screen
-        W, H = SCREEN_W, SCREEN_H
+        W, H = self.W, self.H
 
         # Dim overlay
         overlay = pygame.Surface((W, H), pygame.SRCALPHA)
