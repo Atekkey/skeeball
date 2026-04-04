@@ -1,4 +1,4 @@
-PI = False
+PI = True
 import pygame
 if PI:
     import RPi.GPIO as GPIO
