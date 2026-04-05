@@ -8,4 +8,4 @@ sudo nano /etc/rc.local
 python3 -m pip install -U pygame==2.6.0
 
 # TO RUN ON PI
-python screen.py -PI 
+python main.py

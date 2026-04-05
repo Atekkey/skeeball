@@ -4,9 +4,9 @@ import json
 import os
 import time
 
-PI = not "-NOPI" in sys.argv
+PI = "-NOPI" in sys.argv
 
-if PI:
+if not PI:
     import RPi.GPIO as GPIO
 
 # ── Config ────────────────────────────────────────────────────────────────────
@@ -83,7 +83,7 @@ class SkeeBall:
         self.last_hit = None     # points value of last hit (for lighting up board)
 
         # GPIO
-        if PI:
+        if not PI:
             try:
                 setup_gpio(self._gpio_callback)
                 self.gpio_ok = True

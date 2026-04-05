@@ -4,9 +4,9 @@ import json
 import os
 import time
 
-PI = not "-NOPI" in sys.argv
+PI = "-NOPI" in sys.argv
 
-if PI:
+if not PI:
     import RPi.GPIO as GPIO
 
 # ── Config ────────────────────────────────────────────────────────────────────
@@ -31,12 +31,16 @@ HIGH_SCORE_FILE = "highscores.json"
 # ── Colors ────────────────────────────────────────────────────────────────────
 BG          = (15,  15,  20)
 SURFACE     = (28,  28,  38)
+SURFACE2     = (28,  28,  38+5)
+ACCENT       = (255, 150, 50)
+ACCENT_DIM   = (255, 150, 50, 100)
+GREEN       = (50,  200, 100)
 GOLD        = (186, 117,  23)
 WHITE       = (240, 240, 245)
 GRAY        = (120, 120, 135)
 DARK_GRAY   = (50,  50,  62)
-BLUE        = (50,  100, 200)
 ORANGE      = (255, 150, 50)
+BALL_LAB_COL = (69, 91, 195)
 # ── GPIO setup ────────────────────────────────────────────────────────────────
 def setup_gpio(callback):
     GPIO.setmode(GPIO.BCM)
@@ -52,6 +56,7 @@ def load_scores():
 def save_scores(scores):
     with open(HIGH_SCORE_FILE, "w") as f:
         json.dump(scores, f)
+
 # ── Main app ──────────────────────────────────────────────────────────────────
 
 class SkeeBall:
@@ -61,10 +66,11 @@ class SkeeBall:
         self.W, self.H = self.screen.get_size()
         pygame.display.set_caption("Skeeball")
 
-        self.font_huge  = pygame.font.SysFont("dejavusans", 180, bold=False)
-        self.font_large = pygame.font.SysFont("dejavusans", 90, bold=False)
-        self.font_med   = pygame.font.SysFont("dejavusans", 50, bold=False)
-        self.font_small = pygame.font.SysFont("dejavusans", 36, bold=False)
+        self.font_huge  = pygame.font.SysFont("comicsans", 180, bold=False)
+        self.font_large = pygame.font.SysFont("comicsans", 90, bold=False)
+        self.font_med   = pygame.font.SysFont("comicsans", 50, bold=False)
+        self.font_small = pygame.font.SysFont("comicsans", 36, bold=False)
+        self.font_v_small = pygame.font.SysFont("comicsans", 22, bold=False)
 
         self.clock = pygame.time.Clock()
         self.score = 0
@@ -76,12 +82,12 @@ class SkeeBall:
         self.last_hit = None     # points value of last hit (for lighting up board)
 
         # GPIO
-        if PI:
+        if not PI:
             try:
                 setup_gpio(self._gpio_callback)
                 self.gpio_ok = True
             except Exception as e:
-                print(f"GPIO Failed: {e}")
+                print(f"GPIO not available: {e}")
                 self.gpio_ok = False
         else:
             self.gpio_ok = False
@@ -108,11 +114,14 @@ class SkeeBall:
 
     def _end_game(self):
         self.state = "game_over"
-        # Auto-save score
-        self.high_scores.append({"name": "Player", "score": self.score})
-        self.high_scores.sort(key=lambda h: h["score"], reverse=True)
-        self.high_scores = self.high_scores[:10]
-        save_scores(self.high_scores)
+        if 1: # TODO add Cond
+            self.high_scores.append({"name": "Player", "score": self.score})
+            self.high_scores.sort(key=lambda h: h["score"], reverse=True)
+            self.high_scores = self.high_scores[:10]
+            save_scores(self.high_scores)
+
+
+        self._reset() # TODO REPLACE
 
     def _reset(self):
         self.score = 0
@@ -127,41 +136,41 @@ class SkeeBall:
     def _draw_rounded_rect(self, surf, color, rect, radius=12):
         pygame.draw.rect(surf, color, rect, border_radius=radius)
 
-    def _draw_skeeball_board(self, cx, cy, size):
-        """Draw a skeeball target board centered at (cx, cy) with given size."""
-        scr = self.screen
+    # def _draw_skeeball_board(self, cx, cy, size):
+    #     """Draw a skeeball target board centered at (cx, cy) with given size."""
+    #     scr = self.screen
 
-        # Ring definitions: (points, radius_ratio, color_dim, color_lit)
-        rings = [
-            (10, 1.0,   (40, 50, 45),   (60, 180, 100)),    # outer - 10 pts
-            (20, 0.75,  (50, 45, 50),   (140, 90, 180)),    # 20 pts
-            (30, 0.50,  (50, 50, 60),   (80, 140, 200)),    # 30 pts
-            (50, 0.30,  (60, 50, 45),   (200, 150, 60)),    # 50 pts
-            (100, 0.15, (70, 45, 45),   (220, 80, 80)),     # center - 100 pts
-        ]
+    #     # Ring definitions: (points, radius_ratio, color_dim, color_lit)
+    #     rings = [
+    #         (10, 1.0,   (40, 50, 45),   (60, 180, 100)),    # outer - 10 pts
+    #         (20, 0.75,  (50, 45, 50),   (140, 90, 180)),    # 20 pts
+    #         (30, 0.50,  (50, 50, 60),   (80, 140, 200)),    # 30 pts
+    #         (50, 0.30,  (60, 50, 45),   (200, 150, 60)),    # 50 pts
+    #         (100, 0.15, (70, 45, 45),   (220, 80, 80)),     # center - 100 pts
+    #     ]
 
-        # Draw rings from outer to inner
-        for pts, ratio, col_dim, col_lit in rings:
-            r = int(size * ratio)
-            col = col_lit if self.last_hit == pts else col_dim
-            pygame.draw.circle(scr, col, (cx, cy), r)
-            # Draw ring border
-            pygame.draw.circle(scr, DARK_GRAY, (cx, cy), r, 3)
+    #     # Draw rings from outer to inner
+    #     for pts, ratio, col_dim, col_lit in rings:
+    #         r = int(size * ratio)
+    #         col = col_lit if self.last_hit == pts else col_dim
+    #         pygame.draw.circle(scr, col, (cx, cy), r)
+    #         # Draw ring border
+    #         pygame.draw.circle(scr, DARK_GRAY, (cx, cy), r, 3)
 
-        # Draw point labels on rings
-        label_font = self.font_small
-        label_positions = [
-            (100, 0.075),   # center
-            (50, 0.225),    # 50 ring
-            (30, 0.40),     # 30 ring
-            (20, 0.625),    # 20 ring
-            (10, 0.875),    # 10 ring (outer)
-        ]
-        for pts, ratio in label_positions:
-            label = label_font.render(str(pts), True, WHITE if self.last_hit == pts else GRAY)
-            lx = cx - label.get_width() // 2
-            ly = cy - int(size * ratio) - label.get_height() // 2
-            scr.blit(label, (lx, ly))
+    #     # Draw point labels on rings
+    #     label_font = self.font_small
+    #     label_positions = [
+    #         (100, 0.075),   # center
+    #         (50, 0.225),    # 50 ring
+    #         (30, 0.40),     # 30 ring
+    #         (20, 0.625),    # 20 ring
+    #         (10, 0.875),    # 10 ring (outer)
+    #     ]
+    #     for pts, ratio in label_positions:
+    #         label = label_font.render(str(pts), True, WHITE if self.last_hit == pts else GRAY)
+    #         lx = cx - label.get_width() // 2
+    #         ly = cy - int(size * ratio) - label.get_height() // 2
+    #         scr.blit(label, (lx, ly))
 
     def _draw_playing(self):
         scr = self.screen
@@ -190,30 +199,36 @@ class SkeeBall:
                 scr.blit(fsuf, (20 + panel_w // 2 - fsuf.get_width() // 2, 320))
 
         # # Skeeball board graphic
-        board_cx = 20 + panel_w // 2
-        board_cy = H // 2 + 80
-        board_size = min(panel_w - 100, H - 500) // 2
-        self._draw_skeeball_board(board_cx, board_cy, board_size)
+        # board_cx = 20 + panel_w // 2
+        # board_cy = H // 2 + 80
+        # board_size = min(panel_w - 100, H - 500) // 2
+        # self._draw_skeeball_board(board_cx, board_cy, board_size)
 
         # Balls remaining
-        ball_y = H - 180
-        ball_label = self.font_small.render("BALLS", True, GRAY)
-        scr.blit(ball_label, (20 + panel_w // 2 - ball_label.get_width() // 2, ball_y - 50))
+        ball_y = H - 220
+        ball_label = self.font_med.render("BALLS", True, BALL_LAB_COL)
         ball_r = 35
+        ball_y_2 = 2.5 * ball_r + ball_y
+        scr.blit(ball_label, (20 + panel_w // 2 - ball_label.get_width() // 2, ball_y - 140))
+        
         ball_spacing = 20
         total_balls_w = MAX_BALLS * (ball_r * 2) + (MAX_BALLS - 1) * ball_spacing
-        bx = 20 + panel_w // 2 - total_balls_w // 2 + ball_r
+        bx = 20 + panel_w // 2 - total_balls_w // 4 + ball_r
         balls_remaining = MAX_BALLS - self.balls_thrown
+        
         for i in range(MAX_BALLS):
-            col = ACCENT if i < balls_remaining else DARK_GRAY
-            pygame.draw.circle(scr, col, (bx + i * (ball_r * 2 + ball_spacing), ball_y + ball_r), ball_r)
+            col = ACCENT if MAX_BALLS - i - 1 < balls_remaining else DARK_GRAY
+            if i % 2 == 0:
+                pygame.draw.circle(scr, col, (bx + (i//2) * (ball_r * 2 + ball_spacing), ball_y), ball_r)
+            else: 
+                pygame.draw.circle(scr, col, (bx + (i//2) * (ball_r * 2 + ball_spacing), ball_y_2), ball_r)
 
         # Right panel — high scores (skinny)
         rw = 260
         rx = W - rw - 20
-        self._draw_rounded_rect(scr, SURFACE, (rx, 20, rw, H - 40), 16)
+        self._draw_rounded_rect(scr, SURFACE2, (rx, 20, rw, H - 40), 16)
 
-        hs_title = self.font_small.render("HIGH SCORES", True, GRAY)
+        hs_title = self.font_v_small.render("HIGH SCORES", True, GRAY)
         scr.blit(hs_title, (rx + rw // 2 - hs_title.get_width() // 2, 50))
 
         pygame.draw.line(scr, DARK_GRAY, (rx + 16, 100), (rx + rw - 16, 100), 1)
@@ -221,8 +236,8 @@ class SkeeBall:
         for i, entry in enumerate(self.high_scores[:7]):
             ey = 120 + i * 70
             rank_col = GOLD if i == 0 else (GRAY if i > 2 else WHITE)
-            rank_s = self.font_small.render(f"{i+1}.", True, rank_col)
-            score_s = self.font_med.render(str(entry["score"]), True, ACCENT if i == 0 else WHITE)
+            rank_s = self.font_small.render(str(entry["name"]) + ":", True, rank_col)
+            score_s = self.font_med.render(str(entry["score"]), True, rank_col)
             scr.blit(rank_s, (rx + 16, ey + 4))
             scr.blit(score_s, (rx + rw - 16 - score_s.get_width(), ey))
 
