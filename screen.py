@@ -4,7 +4,7 @@ import json
 import os
 import time
 
-PI = "-PI" in sys.argv
+PI = not "-NOPI" in sys.argv
 
 if PI:
     import RPi.GPIO as GPIO
