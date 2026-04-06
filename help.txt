@@ -9,3 +9,6 @@ python3 -m pip install -U pygame==2.6.0
 
 # TO RUN ON PI
 python main.py
+
+# TO RUN ON PC
+python main.py -NOPI

@@ -4,9 +4,9 @@ import json
 import os
 import time
 
-PI = "-NOPI" in sys.argv
+PI = not ("-NOPI" in sys.argv)
 
-if not PI:
+if PI:
     import RPi.GPIO as GPIO
 
 # ── Config ────────────────────────────────────────────────────────────────────
@@ -26,6 +26,7 @@ SWITCH_PINS = {
     PIN_LARGE_TOP: 40,
     PIN_LARGE_BOT: 30,
 }
+PIN_RESET = 25
 MAX_BALLS = 10
 HIGH_SCORE_FILE = "highscores.json"
 # ── Colors ────────────────────────────────────────────────────────────────────
@@ -35,7 +36,9 @@ SURFACE2     = (28,  28,  38+5)
 ACCENT       = (255, 150, 50)
 ACCENT_DIM   = (255, 150, 50, 100)
 GREEN       = (50,  200, 100)
-GOLD        = (186, 117,  23)
+GOLD        = (186+20, 117+20,  23+20)
+SILVER      = (192, 192, 192)
+BRONZE      = (175, 107,  30)
 WHITE       = (240, 240, 245)
 GRAY        = (120, 120, 135)
 DARK_GRAY   = (50,  50,  62)
@@ -50,6 +53,11 @@ def setup_gpio(callback):
             GPIO.add_event_detect(pin, GPIO.FALLING, callback=callback, bouncetime=300)
         except Exception as e:
             print(f"Error setting up GPIO pin: {pin}")
+    try:
+        GPIO.setup(PIN_RESET, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.add_event_detect(PIN_RESET, GPIO.FALLING, callback=callback, bouncetime=300)
+    except Exception as e:
+        print(f"Error setting up GPIO pin: {PIN_RESET}")
 # ── High score persistence ────────────────────────────────────────────────────
 def load_scores():
     if os.path.exists(HIGH_SCORE_FILE):
@@ -85,7 +93,7 @@ class SkeeBall:
         self.last_hit = None     # points value of last hit (for lighting up board)
 
         # GPIO
-        if not PI:
+        if PI:
             try:
                 setup_gpio(self._gpio_callback)
                 self.gpio_ok = True
@@ -99,8 +107,11 @@ class SkeeBall:
         self._pending_points = []
 
     def _gpio_callback(self, channel):
-        pts = SWITCH_PINS.get(channel, 0)
-        self._pending_points.append(pts)
+        if channel != PIN_RESET:
+            pts = SWITCH_PINS.get(channel, 0)
+            self._pending_points.append(pts)
+        else:
+            self._end_game(True)
 
     # ── Game logic ────────────────────────────────────────────────────────────
 
@@ -115,10 +126,10 @@ class SkeeBall:
         if self.balls_thrown >= MAX_BALLS:
             self._end_game()
 
-    def _end_game(self):
+    def _end_game(self, reset=False):
         self.state = "game_over"
-        if 1: # TODO add Cond
-            self.high_scores.append({"name": "Player", "score": self.score})
+        if not reset:
+            self.high_scores.append({"name": "___", "score": self.score})
             self.high_scores.sort(key=lambda h: h["score"], reverse=True)
             self.high_scores = self.high_scores[:10]
             save_scores(self.high_scores)
@@ -180,7 +191,7 @@ class SkeeBall:
         W, H = self.W, self.H
 
         # Left panel — score
-        panel_w = W - 300
+        panel_w = W - 310
         self._draw_rounded_rect(scr, SURFACE, (20, 20, panel_w, H - 40), 16)
 
         # Score label
@@ -238,7 +249,14 @@ class SkeeBall:
 
         for i, entry in enumerate(self.high_scores[:7]):
             ey = 120 + i * 70
-            rank_col = GOLD if i == 0 else (GRAY if i > 2 else WHITE)
+            if i == 0:
+                rank_col = GOLD
+            elif i == 1:
+                rank_col = SILVER
+            elif i == 2:
+                rank_col = BRONZE
+            else:
+                rank_col = GRAY
             rank_s = self.font_small.render(str(entry["name"]) + ":", True, rank_col)
             score_s = self.font_med.render(str(entry["score"]), True, rank_col)
             scr.blit(rank_s, (rx + 16, ey + 4))
