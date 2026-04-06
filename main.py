@@ -10,19 +10,19 @@ if not PI:
     import RPi.GPIO as GPIO
 
 # ── Config ────────────────────────────────────────────────────────────────────
-PIN_UP_LEFT = 12
-PIN_UP_MID = 17
-PIN_UP_RIGHT = 22
-PIN_BOT = 23
-PIN_LARGE_OUT = 24
+PIN_TOP_LEFT = 12
+PIN_TOP_MID = 17
+PIN_TOP_RIGHT = 22
+PIN_BOTTOM_MOST = 23
+PIN_LARGE_OUTSIDE = 24
 PIN_LARGE_TOP = 26
 PIN_LARGE_BOT = 27
 SWITCH_PINS = {
-    PIN_UP_LEFT: 100,
-    PIN_UP_MID: 50,
-    PIN_UP_RIGHT: 100,
-    PIN_BOT: 0,
-    PIN_LARGE_OUT: 10,
+    PIN_TOP_LEFT: 100,
+    PIN_TOP_MID: 50,
+    PIN_TOP_RIGHT: 100,
+    PIN_BOTTOM_MOST: 0,
+    PIN_LARGE_OUTSIDE: 10,
     PIN_LARGE_TOP: 40,
     PIN_LARGE_BOT: 30,
 }
@@ -45,8 +45,11 @@ BALL_LAB_COL = (69, 91, 195)
 def setup_gpio(callback):
     GPIO.setmode(GPIO.BCM)
     for pin in SWITCH_PINS:
-        GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.add_event_detect(pin, GPIO.FALLING, callback=callback, bouncetime=300)
+        try:
+            GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            GPIO.add_event_detect(pin, GPIO.FALLING, callback=callback, bouncetime=300)
+        except Exception as e:
+            print(f"Error setting up GPIO pin: {pin}")
 # ── High score persistence ────────────────────────────────────────────────────
 def load_scores():
     if os.path.exists(HIGH_SCORE_FILE):
