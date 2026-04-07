@@ -83,6 +83,7 @@ class SkeeBall:
         self.W, self.H = self.screen.get_size()
         pygame.display.set_caption("Skeeball")
 
+        self.font_huge_score  = pygame.font.SysFont("comicsans", 280, bold=False)
         self.font_huge  = pygame.font.SysFont("comicsans", 180, bold=False)
         self.font_large = pygame.font.SysFont("comicsans", 90, bold=False)
         self.font_med   = pygame.font.SysFont("comicsans", 50, bold=False)
@@ -197,7 +198,7 @@ class SkeeBall:
         scr.blit(lbl, (20 + panel_w // 2 - lbl.get_width() // 2, 60))
 
         # Score number
-        score_surf = self.font_huge.render(str(self.score), True, WHITE)
+        score_surf = self.font_huge_score.render(str(self.score), True, WHITE)
         scr.blit(score_surf, (20 + panel_w // 2 - score_surf.get_width() // 2, 120))
 
         # Flash "+pts"
@@ -206,7 +207,7 @@ class SkeeBall:
             age = pygame.time.get_ticks() - ts
             if age < 1000:
                 alpha = max(0, 255 - int(255 * age / 1000))
-                fsuf = self.font_large.render(f"+{pts}", True, GREEN)
+                fsuf = self.font_huge.render(f"+{pts}", True, GREEN)
                 fsuf.set_alpha(alpha)
                 scr.blit(fsuf, (20 + panel_w // 2 - fsuf.get_width() // 2, 320))
 
