@@ -111,8 +111,8 @@ class SkeeBall:
             if channel != PIN_RESET:
                 pts = SWITCH_PINS.get(channel, 0)
                 self._pending_points.append(pts)
-            else:
-                self._end_game(True)
+                return
+        self._end_game(True)
 
     # ── Game logic ────────────────────────────────────────────────────────────
 
