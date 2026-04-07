@@ -11,12 +11,12 @@ if PI:
 
 # ── Config ────────────────────────────────────────────────────────────────────
 PIN_TOP_LEFT = 12
-PIN_TOP_MID = 17
+PIN_TOP_MID = 27 # was 17
 PIN_TOP_RIGHT = 16 # was 22
-PIN_BOTTOM_MOST = 6 # was 23
+PIN_BOTTOM_MOST = 26 # was 23
 PIN_LARGE_OUTSIDE = 24
-PIN_LARGE_TOP = 26
-PIN_LARGE_BOT = 27
+PIN_LARGE_TOP = 6
+PIN_LARGE_BOT = 17 # was 27
 SWITCH_PINS = {
     PIN_TOP_LEFT: 100,
     PIN_TOP_MID: 50,
