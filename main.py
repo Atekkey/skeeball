@@ -12,8 +12,8 @@ if PI:
 # ── Config ────────────────────────────────────────────────────────────────────
 PIN_TOP_LEFT = 12
 PIN_TOP_MID = 17
-PIN_TOP_RIGHT = 22
-PIN_BOTTOM_MOST = 23
+PIN_TOP_RIGHT = 16 # was 22
+PIN_BOTTOM_MOST = 6 # was 23
 PIN_LARGE_OUTSIDE = 24
 PIN_LARGE_TOP = 26
 PIN_LARGE_BOT = 27
