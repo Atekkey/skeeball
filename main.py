@@ -11,12 +11,12 @@ if PI:
 
 # ── Config ────────────────────────────────────────────────────────────────────
 PIN_TOP_LEFT = 12
-PIN_TOP_MID = 27 # was 17
-PIN_TOP_RIGHT = 16 # was 22
+PIN_TOP_MID = 16 # was 17
+PIN_TOP_RIGHT = 27 # was 22
 PIN_BOTTOM_MOST = 26 # was 23
 PIN_LARGE_OUTSIDE = 24
 PIN_LARGE_TOP = 6
-PIN_LARGE_BOT = 17 # was 27
+PIN_LARGE_BOT = 25 # was 27
 SWITCH_PINS = {
     PIN_TOP_LEFT: 100,
     PIN_TOP_MID: 50,
@@ -26,7 +26,7 @@ SWITCH_PINS = {
     PIN_LARGE_TOP: 40,
     PIN_LARGE_BOT: 30,
 }
-PIN_RESET = 25
+PIN_RESET = 17
 MAX_BALLS = 10
 HIGH_SCORE_FILE = "highscores.json"
 # ── Colors ────────────────────────────────────────────────────────────────────
