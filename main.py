@@ -56,7 +56,7 @@ def setup_gpio(callback):
             print(f"Error setting up GPIO pin: {pin}")
     try:
         GPIO.setup(PIN_RESET, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.add_event_detect(PIN_RESET, GPIO.FALLING, callback=callback, bouncetime=300) # check time later
+        GPIO.add_event_detect(PIN_RESET, GPIO.FALLING, callback=callback, bouncetime=20) # check time later
     except Exception as e:
         print(f"Error setting up GPIO pin: {PIN_RESET}")
 # ── High score persistence ────────────────────────────────────────────────────
