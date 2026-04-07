@@ -160,6 +160,7 @@ class SkeeBall:
         self.high_scores.sort(key=lambda h: h["score"], reverse=True)
         self.high_scores = self.high_scores[:10]
         save_scores(self.high_scores)
+        time.sleep(1) # Prevent double click on pts
         self._reset()
         
     def _reset(self):
