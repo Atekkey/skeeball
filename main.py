@@ -197,7 +197,7 @@ class SkeeBall:
         if self.flash:
             pts, ts = self.flash
             age = pygame.time.get_ticks() - ts
-            if age < 1000:
+            if age < 100:
                 alpha = max(0, 255 - int(255 * age / 1000))
                 fsuf = self.font_large.render(f"+{pts}", True, GREEN)
                 fsuf.set_alpha(alpha)
