@@ -82,7 +82,7 @@ class SkeeBall:
         self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
         self.W, self.H = self.screen.get_size()
         pygame.display.set_caption("Skeeball")
-
+        
         self.font_huge_score  = pygame.font.SysFont("comicsans", 280, bold=False)
         self.font_huge  = pygame.font.SysFont("comicsans", 180, bold=False)
         self.font_large = pygame.font.SysFont("comicsans", 90, bold=False)
