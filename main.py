@@ -10,11 +10,11 @@ if PI:
     import RPi.GPIO as GPIO
 
 # ── Config ────────────────────────────────────────────────────────────────────
-PIN_TOP_LEFT = 12
+PIN_TOP_LEFT = 24
 PIN_TOP_MID = 16 
 PIN_TOP_RIGHT = 27 # GOOD
 PIN_BOTTOM_0 = 26 # GOOD
-PIN_BOTTOM_1 = 24
+PIN_BOTTOM_1 = 12
 PIN_BOTTOM_2 = 6
 PIN_BOTTOM_3 = 25 
 SWITCH_PINS = {
