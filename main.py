@@ -263,7 +263,7 @@ class SkeeBall:
         sc_text = self.font_med.render(f"Final Score: {self.score}", True, ACCENT)
         scr.blit(sc_text, (mx + mw // 2 - sc_text.get_width() // 2, my + 100))
     
-    def _draw_enter_inits(self):
+    # def _draw_enter_inits(self):
         # Click reset button to cycle letter
         # throw ball in any hole to confirm that letter and move to next
 
