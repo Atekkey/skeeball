@@ -13,10 +13,10 @@ if PI:
 PIN_TOP_LEFT = 24 # GOOD
 PIN_TOP_MID = 12 
 PIN_TOP_RIGHT = 27 # GOOD
-PIN_BOTTOM_0 = 26 # GOOD??
+PIN_BOTTOM_0 = 26 # GOOD
 PIN_BOTTOM_1 = 25
-PIN_BOTTOM_2 = 17 # Swapping 1 and 2 swapped 1&3
-PIN_BOTTOM_3 = 6 # now 2 and 3
+PIN_BOTTOM_2 = 17
+PIN_BOTTOM_3 = 6 
 SWITCH_PINS = {
     PIN_TOP_LEFT: 100,
     PIN_TOP_MID: 50,
@@ -107,12 +107,22 @@ class SkeeBall:
         self._pending_points = []
 
     def _gpio_callback(self, channel):
+        if self.state == "initials":
+            if channel == PIN_RESET:
+                self.ords[self.letter_idx] += 1
+                if self.ords[self.letter_idx] > 90: # Z to A
+                    self.ords[self.letter_idx] = 65
+            else:
+                self.letter_idx += 1
+                if self.letter_idx >= 3:
+                    self._submit_inits()
         if self.state == "playing":
             if channel != PIN_RESET:
                 pts = SWITCH_PINS.get(channel, 0)
                 self._pending_points.append(pts)
                 return
-        self._end_game(True)
+        if self.state != "initials":
+            self._end_game(True)
 
     # ── Game logic ────────────────────────────────────────────────────────────
 
@@ -137,16 +147,19 @@ class SkeeBall:
         self.high_scores.sort(key=lambda h: h["score"], reverse=True)
         tenth_high = (self.high_scores[min(9, len(self.high_scores)-1)])["score"] # 10th highest
 
-        # initials = "___" self._draw_enter_inits()
-
         if self.score > tenth_high or len(self.high_scores) < 10:
-            self.high_scores.append({"name": "___", "score": self.score})
-            self.high_scores.sort(key=lambda h: h["score"], reverse=True)
-            self.high_scores = self.high_scores[:10]
-            save_scores(self.high_scores)
+            self.state = "initials"
         
         # self._reset() # TODO REPLACE
 
+    def _submit_inits(self):
+        self._draw_enter_inits()
+        initials = "".join(chr(o) for o in self.ords)
+        self.high_scores.append({"name": initials, "score": self.score})
+        self.high_scores.sort(key=lambda h: h["score"], reverse=True)
+        self.high_scores = self.high_scores[:10]
+        save_scores(self.high_scores)
+        
     def _reset(self):
         self.score = 0
         self.balls_thrown = 0
@@ -263,9 +276,18 @@ class SkeeBall:
         sc_text = self.font_med.render(f"Final Score: {self.score}", True, ACCENT)
         scr.blit(sc_text, (mx + mw // 2 - sc_text.get_width() // 2, my + 100))
     
-    # def _draw_enter_inits(self):
+    def _draw_enter_inits(self):
         # Click reset button to cycle letter
         # throw ball in any hole to confirm that letter and move to next
+        self.ords = [65, 65, 65]
+        self.letter_idx = 0
+        try:
+            for i in range(3):
+                while "initials" in self.state:
+                    time.sleep(1)
+                
+        except:
+            return "---"
 
 
     # ── Main loop ─────────────────────────────────────────────────────────────
@@ -289,6 +311,8 @@ class SkeeBall:
             self._draw_playing()
             if self.state == "game_over":
                 self._draw_game_over()
+            if self.state == "initials":
+                self._draw_enter_inits()
 
             pygame.display.flip()
 
