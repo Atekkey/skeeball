@@ -135,7 +135,7 @@ class SkeeBall:
         ## END BY 10 balls thrown        
 
         self.high_scores.sort(key=lambda h: h["score"], reverse=True)
-        tenth_high = (self.high_scores[9])["score"] # 10th highest
+        tenth_high = (self.high_scores[min(9, len(self.high_scores)-1)])["score"] # 10th highest
 
         # initials = "___" self._draw_enter_inits()
 
