@@ -12,6 +12,6 @@ if [ "$_IP" ]; then
   printf "My IP address is %s\n" "$_IP"
 fi
 
-sudo python /home/triangle/skeeball/main.py 9 &
+sudo DISPLAY=:0 python /home/triangle/skeeball/main.py 9 &
 
 exit 0
