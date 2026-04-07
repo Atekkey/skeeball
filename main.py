@@ -27,6 +27,7 @@ SWITCH_PINS = {
     PIN_BOTTOM_3: 40,
 }
 PIN_RESET = 16 # GOOD
+
 MAX_BALLS = 10
 HIGH_SCORE_FILE = "highscores.json"
 # ── Colors ────────────────────────────────────────────────────────────────────
@@ -197,7 +198,7 @@ class SkeeBall:
         if self.flash:
             pts, ts = self.flash
             age = pygame.time.get_ticks() - ts
-            if age < 100:
+            if age < 1000:
                 alpha = max(0, 255 - int(255 * age / 1000))
                 fsuf = self.font_large.render(f"+{pts}", True, GREEN)
                 fsuf.set_alpha(alpha)
@@ -304,7 +305,7 @@ class SkeeBall:
         pygame.draw.rect(scr, ACCENT, (mx, my, mw, mh), 3, border_radius=16)
 
         # "NEW HIGH SCORE!" title
-        title = self.font_large.render("NEW HIGH SCORE!", True, GOLD)
+        title = self.font_med.render("NEW HIGH SCORE!", True, GOLD)
         scr.blit(title, (mx + mw // 2 - title.get_width() // 2, my + 30))
 
         # Score display
