@@ -51,7 +51,7 @@ def setup_gpio(callback):
     for pin in SWITCH_PINS:
         try:
             GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(pin, GPIO.RISING, callback=callback, bouncetime=500)
+            GPIO.add_event_detect(pin, GPIO.RISING, callback=callback, bouncetime=800)
         except Exception as e:
             print(f"Error setting up GPIO pin: {pin}")
     try:
