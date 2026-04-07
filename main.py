@@ -160,7 +160,6 @@ class SkeeBall:
         self.high_scores.sort(key=lambda h: h["score"], reverse=True)
         self.high_scores = self.high_scores[:10]
         save_scores(self.high_scores)
-        time.sleep(1) # Prevent double click on pts
         self._reset()
         
     def _reset(self):
@@ -169,12 +168,9 @@ class SkeeBall:
         self.history = []
         self.flash = None
         self.last_hit = None
+        time.sleep(2) # avoid retrig
         self.state = "playing"
-        # Clear initials state for next high score entry
-        if hasattr(self, 'ords'):
-            del self.ords
-        if hasattr(self, 'letter_idx'):
-            del self.letter_idx
+        
 
     # ── Drawing ───────────────────────────────────────────────────────────────
 
