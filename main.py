@@ -50,12 +50,12 @@ def setup_gpio(callback):
     for pin in SWITCH_PINS:
         try:
             GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(pin, GPIO.FALLING, callback=callback, bouncetime=300)
+            GPIO.add_event_detect(pin, GPIO.FALLING, callback=callback, bouncetime=1000)
         except Exception as e:
             print(f"Error setting up GPIO pin: {pin}")
     try:
         GPIO.setup(PIN_RESET, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.add_event_detect(PIN_RESET, GPIO.FALLING, callback=callback, bouncetime=300)
+        GPIO.add_event_detect(PIN_RESET, GPIO.FALLING, callback=callback, bouncetime=100) # check time later
     except Exception as e:
         print(f"Error setting up GPIO pin: {PIN_RESET}")
 # ── High score persistence ────────────────────────────────────────────────────
@@ -111,7 +111,9 @@ class SkeeBall:
             if channel == PIN_RESET:
                 self.ords[self.letter_idx] += 1
                 if self.ords[self.letter_idx] > 90: # Z to A
-                    self.ords[self.letter_idx] = 65
+                    self.ords[self.letter_idx] = 45 # -
+                elif self.ords[self.letter_idx] == 46: # - to A
+                    self.ords[self.letter_idx] = 65 # A
             else:
                 self.letter_idx += 1
                 if self.letter_idx >= 3:
@@ -153,12 +155,12 @@ class SkeeBall:
         # self._reset() # TODO REPLACE
 
     def _submit_inits(self):
-        self._draw_enter_inits()
         initials = "".join(chr(o) for o in self.ords)
         self.high_scores.append({"name": initials, "score": self.score})
         self.high_scores.sort(key=lambda h: h["score"], reverse=True)
         self.high_scores = self.high_scores[:10]
         save_scores(self.high_scores)
+        self._reset()
         
     def _reset(self):
         self.score = 0
@@ -167,6 +169,11 @@ class SkeeBall:
         self.flash = None
         self.last_hit = None
         self.state = "playing"
+        # Clear initials state for next high score entry
+        if hasattr(self, 'ords'):
+            del self.ords
+        if hasattr(self, 'letter_idx'):
+            del self.letter_idx
 
     # ── Drawing ───────────────────────────────────────────────────────────────
 
@@ -279,15 +286,74 @@ class SkeeBall:
     def _draw_enter_inits(self):
         # Click reset button to cycle letter
         # throw ball in any hole to confirm that letter and move to next
-        self.ords = [65, 65, 65]
-        self.letter_idx = 0
-        try:
-            for i in range(3):
-                while "initials" in self.state:
-                    time.sleep(1)
-                
-        except:
-            return "---"
+
+        # Initialize ords and letter_idx only once (on first call)
+        if not hasattr(self, 'ords'):
+            self.ords = [45, 45, 45]  # ---
+            self.letter_idx = 0
+
+        scr = self.screen
+        W, H = self.W, self.H
+
+        # Dim overlay
+        overlay = pygame.Surface((W, H), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 180))
+        scr.blit(overlay, (0, 0))
+
+        # Modal box
+        mw, mh = 600, 400
+        mx, my = W // 2 - mw // 2, H // 2 - mh // 2
+        self._draw_rounded_rect(scr, SURFACE, (mx, my, mw, mh), 16)
+        pygame.draw.rect(scr, ACCENT, (mx, my, mw, mh), 3, border_radius=16)
+
+        # "NEW HIGH SCORE!" title
+        title = self.font_large.render("NEW HIGH SCORE!", True, GOLD)
+        scr.blit(title, (mx + mw // 2 - title.get_width() // 2, my + 30))
+
+        # Score display
+        sc_text = self.font_med.render(f"Score: {self.score}", True, WHITE)
+        scr.blit(sc_text, (mx + mw // 2 - sc_text.get_width() // 2, my + 110))
+
+        # "Enter Initials" label
+        enter_lbl = self.font_small.render("ENTER INITIALS", True, GRAY)
+        scr.blit(enter_lbl, (mx + mw // 2 - enter_lbl.get_width() // 2, my + 170))
+
+        # Draw the 3 letter boxes
+        box_size = 80
+        box_spacing = 30
+        total_w = 3 * box_size + 2 * box_spacing
+        box_start_x = mx + mw // 2 - total_w // 2
+        box_y = my + 220
+
+        for i in range(3):
+            bx = box_start_x + i * (box_size + box_spacing)
+
+            # Box background - highlight current letter
+            if i == self.letter_idx:
+                self._draw_rounded_rect(scr, ACCENT, (bx - 4, box_y - 4, box_size + 8, box_size + 8), 12)
+                box_col = SURFACE2
+                letter_col = WHITE
+            elif i < self.letter_idx:
+                box_col = DARK_GRAY
+                letter_col = GREEN
+            else:
+                box_col = DARK_GRAY
+                letter_col = GRAY
+
+            self._draw_rounded_rect(scr, box_col, (bx, box_y, box_size, box_size), 10)
+
+            # Draw the letter
+            letter = chr(self.ords[i])
+            letter_surf = self.font_large.render(letter, True, letter_col)
+            lx = bx + box_size // 2 - letter_surf.get_width() // 2
+            ly = box_y + box_size // 2 - letter_surf.get_height() // 2
+            scr.blit(letter_surf, (lx, ly))
+
+        # Instructions at bottom
+        instr1 = self.font_v_small.render("RESET BUTTON = Change Letter", True, GRAY)
+        instr2 = self.font_v_small.render("ANY HOLE = Confirm Letter", True, GRAY)
+        scr.blit(instr1, (mx + mw // 2 - instr1.get_width() // 2, my + mh - 70))
+        scr.blit(instr2, (mx + mw // 2 - instr2.get_width() // 2, my + mh - 40))
 
 
     # ── Main loop ─────────────────────────────────────────────────────────────
