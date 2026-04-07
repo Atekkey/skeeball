@@ -28,7 +28,7 @@ SWITCH_PINS = {
 }
 PIN_RESET = 16 # GOOD
 
-MAX_BALLS = 10
+MAX_BALLS = 6
 HIGH_SCORE_FILE = "highscores.json"
 # ── Colors ────────────────────────────────────────────────────────────────────
 BG          = (15,  15,  20)
