@@ -51,7 +51,7 @@ def setup_gpio(callback):
     for pin in SWITCH_PINS:
         try:
             GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(pin, GPIO.FALLING, callback=callback, bouncetime=1000)
+            GPIO.add_event_detect(pin, GPIO.FALLING, callback=callback, bouncetime=500)
         except Exception as e:
             print(f"Error setting up GPIO pin: {pin}")
     try:
@@ -119,6 +119,7 @@ class SkeeBall:
                 self.letter_idx += 1
                 if self.letter_idx >= 3:
                     self._submit_inits()
+                    return
         if self.state == "playing":
             if channel != PIN_RESET:
                 pts = SWITCH_PINS.get(channel, 0)
