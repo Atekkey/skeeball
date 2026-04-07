@@ -107,11 +107,12 @@ class SkeeBall:
         self._pending_points = []
 
     def _gpio_callback(self, channel):
-        if channel != PIN_RESET:
-            pts = SWITCH_PINS.get(channel, 0)
-            self._pending_points.append(pts)
-        else:
-            self._end_game(True)
+        if self.state == "playing":
+            if channel != PIN_RESET:
+                pts = SWITCH_PINS.get(channel, 0)
+                self._pending_points.append(pts)
+            else:
+                self._end_game(True)
 
     # ── Game logic ────────────────────────────────────────────────────────────
 
@@ -128,14 +129,23 @@ class SkeeBall:
 
     def _end_game(self, reset=False):
         self.state = "game_over"
-        if not reset:
+        if reset:
+            self._reset()
+            return
+        ## END BY 10 balls thrown        
+
+        self.high_scores.sort(key=lambda h: h["score"], reverse=True)
+        tenth_high = (self.high_scores[9])["score"] # 10th highest
+
+        # initials = "___" self._draw_enter_inits()
+
+        if self.score > tenth_high or len(self.high_scores) < 10:
             self.high_scores.append({"name": "___", "score": self.score})
             self.high_scores.sort(key=lambda h: h["score"], reverse=True)
             self.high_scores = self.high_scores[:10]
             save_scores(self.high_scores)
-
-
-        self._reset() # TODO REPLACE
+        
+        # self._reset() # TODO REPLACE
 
     def _reset(self):
         self.score = 0
@@ -149,43 +159,7 @@ class SkeeBall:
 
     def _draw_rounded_rect(self, surf, color, rect, radius=12):
         pygame.draw.rect(surf, color, rect, border_radius=radius)
-
-    # def _draw_skeeball_board(self, cx, cy, size):
-    #     """Draw a skeeball target board centered at (cx, cy) with given size."""
-    #     scr = self.screen
-
-    #     # Ring definitions: (points, radius_ratio, color_dim, color_lit)
-    #     rings = [
-    #         (10, 1.0,   (40, 50, 45),   (60, 180, 100)),    # outer - 10 pts
-    #         (20, 0.75,  (50, 45, 50),   (140, 90, 180)),    # 20 pts
-    #         (30, 0.50,  (50, 50, 60),   (80, 140, 200)),    # 30 pts
-    #         (50, 0.30,  (60, 50, 45),   (200, 150, 60)),    # 50 pts
-    #         (100, 0.15, (70, 45, 45),   (220, 80, 80)),     # center - 100 pts
-    #     ]
-
-    #     # Draw rings from outer to inner
-    #     for pts, ratio, col_dim, col_lit in rings:
-    #         r = int(size * ratio)
-    #         col = col_lit if self.last_hit == pts else col_dim
-    #         pygame.draw.circle(scr, col, (cx, cy), r)
-    #         # Draw ring border
-    #         pygame.draw.circle(scr, DARK_GRAY, (cx, cy), r, 3)
-
-    #     # Draw point labels on rings
-    #     label_font = self.font_small
-    #     label_positions = [
-    #         (100, 0.075),   # center
-    #         (50, 0.225),    # 50 ring
-    #         (30, 0.40),     # 30 ring
-    #         (20, 0.625),    # 20 ring
-    #         (10, 0.875),    # 10 ring (outer)
-    #     ]
-    #     for pts, ratio in label_positions:
-    #         label = label_font.render(str(pts), True, WHITE if self.last_hit == pts else GRAY)
-    #         lx = cx - label.get_width() // 2
-    #         ly = cy - int(size * ratio) - label.get_height() // 2
-    #         scr.blit(label, (lx, ly))
-
+    
     def _draw_playing(self):
         scr = self.screen
         W, H = self.W, self.H
@@ -233,8 +207,10 @@ class SkeeBall:
         for i in range(MAX_BALLS):
             col = ACCENT if MAX_BALLS - i - 1 < balls_remaining else DARK_GRAY
             if i % 2 == 0:
+                pygame.draw.circle(scr, BALL_LAB_COL, (bx + (i//2) * (ball_r * 2 + ball_spacing), ball_y), ball_r+3)
                 pygame.draw.circle(scr, col, (bx + (i//2) * (ball_r * 2 + ball_spacing), ball_y), ball_r)
             else: 
+                pygame.draw.circle(scr, BALL_LAB_COL, (bx + (i//2) * (ball_r * 2 + ball_spacing), ball_y_2), ball_r+3)
                 pygame.draw.circle(scr, col, (bx + (i//2) * (ball_r * 2 + ball_spacing), ball_y_2), ball_r)
 
         # Right panel — high scores (skinny)
@@ -247,7 +223,7 @@ class SkeeBall:
 
         pygame.draw.line(scr, DARK_GRAY, (rx + 16, 100), (rx + rw - 16, 100), 1)
 
-        for i, entry in enumerate(self.high_scores[:7]):
+        for i, entry in enumerate(self.high_scores[:10]):
             ey = 120 + i * 70
             if i == 0:
                 rank_col = GOLD
@@ -286,6 +262,11 @@ class SkeeBall:
 
         sc_text = self.font_med.render(f"Final Score: {self.score}", True, ACCENT)
         scr.blit(sc_text, (mx + mw // 2 - sc_text.get_width() // 2, my + 100))
+    
+    def _draw_enter_inits(self):
+        # Click reset button to cycle letter
+        # throw ball in any hole to confirm that letter and move to next
+
 
     # ── Main loop ─────────────────────────────────────────────────────────────
 
