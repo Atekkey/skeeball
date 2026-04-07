@@ -168,7 +168,7 @@ class SkeeBall:
         self.history = []
         self.flash = None
         self.last_hit = None
-        time.sleep(2) # avoid retrig
+        self.letter_idx = 0
         self.state = "playing"
         
 
