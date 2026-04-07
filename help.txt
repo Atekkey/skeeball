@@ -12,3 +12,14 @@ python main.py
 
 # TO RUN ON PC
 python main.py -NOPI
+
+### BEGIN SETUP
+mkdir -p /home/triangle/.config/autostart
+nano /home/triangle/.config/autostart/skeeball.desktop
+    ### 
+    [Desktop Entry]
+    Type=Application
+    Name=Skeeball
+    Exec=python3 /home/triangle/skeeball/main.py 9
+    ###
+### END

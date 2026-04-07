@@ -1,8 +1,0 @@
-#!/bin/sh -e
-#
-# rc.local
-#
-
-sleep 25 && DISPLAY=:0 python3 /home/triangle/skeeball/main.py 9 &
-
-exit 0
