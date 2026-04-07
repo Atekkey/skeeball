@@ -10,15 +10,15 @@ if PI:
     import RPi.GPIO as GPIO
 
 # ── Config ────────────────────────────────────────────────────────────────────
-PIN_TOP_LEFT = 24
-PIN_TOP_MID = 16 
+PIN_TOP_LEFT = 24 # GOOD
+PIN_TOP_MID = 17 
 PIN_TOP_RIGHT = 27 # GOOD
-PIN_BOTTOM_0 = 26 # GOOD
+PIN_BOTTOM_0 = 26 
 PIN_BOTTOM_1 = 12
 PIN_BOTTOM_2 = 6
 PIN_BOTTOM_3 = 25 
 SWITCH_PINS = {
-    PIN_TOP_LEFT: 101,
+    PIN_TOP_LEFT: 100,
     PIN_TOP_MID: 50,
     PIN_TOP_RIGHT: 100,
     PIN_BOTTOM_0: 0,
@@ -26,7 +26,7 @@ SWITCH_PINS = {
     PIN_BOTTOM_2: 30,
     PIN_BOTTOM_3: 40,
 }
-PIN_RESET = 17
+PIN_RESET = 16
 MAX_BALLS = 10
 HIGH_SCORE_FILE = "highscores.json"
 # ── Colors ────────────────────────────────────────────────────────────────────
