@@ -203,7 +203,7 @@ class SkeeBall:
         self._draw_rounded_rect(scr, SURFACE, (20, 20, panel_w, H - 40), 16)
 
         # Score label
-        f = self.font_small if not PI else self.font_med
+        f = self.font_small if not PI else self.font_large
         lbl = f.render("SCORE", True, GRAY)
         scr.blit(lbl, (20 + panel_w // 2 - lbl.get_width() // 2, 60))
 
@@ -224,7 +224,7 @@ class SkeeBall:
         # Balls remaining
         ball_y = H - 220 - 100
         ball_label = self.font_large.render("BALLS", True, BALL_LAB_COL)
-        ball_r = 35
+        ball_r = 35 if not PI else 60
         ball_y_2 = 2.5 * ball_r + ball_y
         scr.blit(ball_label, (20 + panel_w // 2 - ball_label.get_width() // 2, ball_y - 140))
         
