@@ -5,6 +5,7 @@ import os
 import time
 
 PI = not ("-NOPI" in sys.argv)
+EOH_MODE = "-EOH" in sys.argv
 
 if PI:
     import RPi.GPIO as GPIO
@@ -83,7 +84,7 @@ class SkeeBall:
         self.W, self.H = self.screen.get_size()
         pygame.display.set_caption("Skeeball")
         
-        self.font_huge_score  = pygame.font.SysFont("comicsans", 380, bold=False)
+        self.font_huge_score  = pygame.font.SysFont("comicsans", 280 + (PI*240), bold=False)
         self.font_huge  = pygame.font.SysFont("comicsans", 180, bold=False)
         self.font_large = pygame.font.SysFont("comicsans", 90, bold=False)
         self.font_med   = pygame.font.SysFont("comicsans", 50, bold=False)
@@ -156,7 +157,8 @@ class SkeeBall:
             self._reset()
             return
         ## END BY 10 balls thrown        
-
+        if EOH_MODE:
+            return
         self.high_scores.sort(key=lambda h: h["score"], reverse=True)
         tenth_high = (self.high_scores[min(9, len(self.high_scores)-1)])["score"] # 10th highest
 

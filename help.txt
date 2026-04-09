@@ -20,9 +20,9 @@ nano /home/triangle/.config/autostart/skeeball.desktop
     [Desktop Entry]
     Type=Application
     Name=Skeeball
-    Exec=cd /home/triangle/skeeball && git pull && python /home/triangle/skeeball/main.py 9
+    Exec=lxterminal -e bash -c "cd /home/triangle/skeeball && python launcher.py -EOH; bash"
     ###
 ### END
 
-Todo: try:
-Exec=lxterminal -e bash -c "cd /home/triangle/skeeball && python launcher.py; bash"
+can also 'sudo cp' the skeeball.desktop onto /home/triangle/desktop/FNAME.desktop
+to have it clickable on main screen
