@@ -3,7 +3,11 @@ import sys
 import time
 import RPi.GPIO as GPIO
 
-subprocess.run(["git", "pull"])
+try:
+    subprocess.run(["git", "pull"])
+except:
+    pass
+
 while True:
     try:
         GPIO.cleanup()

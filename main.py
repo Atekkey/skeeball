@@ -199,7 +199,7 @@ class SkeeBall:
         W, H = self.W, self.H
 
         # Left panel — score
-        panel_w = W - 310
+        panel_w = W - (310 * (not EOH))
         self._draw_rounded_rect(scr, SURFACE, (20, 20, panel_w, H - 40), 16)
 
         # Score label
@@ -220,13 +220,7 @@ class SkeeBall:
                 fsuf = self.font_huge.render(f"+{pts}", True, GREEN)
                 fsuf.set_alpha(alpha)
                 scr.blit(fsuf, (20 + panel_w // 2 - fsuf.get_width() // 2, 320))
-
-        # # Skeeball board graphic
-        # board_cx = 20 + panel_w // 2
-        # board_cy = H // 2 + 80
-        # board_size = min(panel_w - 100, H - 500) // 2
-        # self._draw_skeeball_board(board_cx, board_cy, board_size)
-
+        
         # Balls remaining
         ball_y = H - 220
         ball_label = self.font_med.render("BALLS", True, BALL_LAB_COL)
