@@ -25,4 +25,4 @@ nano /home/triangle/.config/autostart/skeeball.desktop
 ### END
 
 Todo: try:
-Exec=lxterminal -e bash -c "cd /home/triangle/skeeball && python main.py 9; bash"
+Exec=lxterminal -e bash -c "cd /home/triangle/skeeball && python launcher.py; bash"
