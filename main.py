@@ -199,7 +199,8 @@ class SkeeBall:
         self._draw_rounded_rect(scr, SURFACE, (20, 20, panel_w, H - 40), 16)
 
         # Score label
-        lbl = self.font_small.render("SCORE", True, GRAY)
+        f = self.font_small if not PI else self.font_med
+        lbl = f.render("SCORE", True, GRAY)
         scr.blit(lbl, (20 + panel_w // 2 - lbl.get_width() // 2, 60))
 
         # Score number
