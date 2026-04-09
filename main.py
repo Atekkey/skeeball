@@ -228,7 +228,7 @@ class SkeeBall:
         ball_y_2 = 2.5 * ball_r + ball_y
         scr.blit(ball_label, (20 + panel_w // 2 - ball_label.get_width() // 2, ball_y - 140))
         
-        ball_spacing = 20
+        ball_spacing = 20 + (PI*10)
         total_balls_w = MAX_BALLS * (ball_r * 2) + (MAX_BALLS - 1) * ball_spacing
         bx = 20 + panel_w // 2 - total_balls_w // 4 + ball_r
         balls_remaining = MAX_BALLS - self.balls_thrown
@@ -236,10 +236,10 @@ class SkeeBall:
         for i in range(MAX_BALLS):
             col = ACCENT if MAX_BALLS - i - 1 < balls_remaining else DARK_GRAY
             if i % 2 == 0:
-                pygame.draw.circle(scr, BALL_LAB_COL, (bx + (i//2) * (ball_r * 2 + ball_spacing), ball_y), ball_r+3 + (PI*10))
+                pygame.draw.circle(scr, BALL_LAB_COL, (bx + (i//2) * (ball_r * 2 + ball_spacing), ball_y), ball_r+3 + (PI*3))
                 pygame.draw.circle(scr, col, (bx + (i//2) * (ball_r * 2 + ball_spacing), ball_y), ball_r)
             else: 
-                pygame.draw.circle(scr, BALL_LAB_COL, (diff + bx + (i//2) * (ball_r * 2 + ball_spacing), ball_y_2), ball_r+3+ (PI*10))
+                pygame.draw.circle(scr, BALL_LAB_COL, (diff + bx + (i//2) * (ball_r * 2 + ball_spacing), ball_y_2), ball_r+3+ (PI*3))
                 pygame.draw.circle(scr, col, (diff + bx + (i//2) * (ball_r * 2 + ball_spacing), ball_y_2), ball_r)
 
         # Right panel — high scores (skinny)
