@@ -17,18 +17,18 @@ PIN_BOTTOM_0 = 26 # GOOD
 PIN_BOTTOM_1 = 25
 PIN_BOTTOM_2 = 17
 PIN_BOTTOM_3 = 6 
-SWITCH_PINS = {
+SWITCH_PINS = { # SCORES
     PIN_TOP_LEFT: 100,
     PIN_TOP_MID: 50,
     PIN_TOP_RIGHT: 100,
-    PIN_BOTTOM_0: 0,
-    PIN_BOTTOM_1: 10,
+    PIN_BOTTOM_0: 10,
+    PIN_BOTTOM_1: 20,
     PIN_BOTTOM_2: 30,
     PIN_BOTTOM_3: 40,
 }
 PIN_RESET = 16 # GOOD
 
-MAX_BALLS = 10
+MAX_BALLS = 9
 try:
     MAX_BALLS = int(sys.argv[-1])
 except (IndexError, ValueError):
@@ -114,25 +114,28 @@ class SkeeBall:
         self._pending_points = []
 
     def _gpio_callback(self, channel):
-        if self.state == "initials":
-            if channel == PIN_RESET:
-                self.ords[self.letter_idx] += 1
-                if self.ords[self.letter_idx] > 90: # Z to A
-                    self.ords[self.letter_idx] = 45 # -
-                elif self.ords[self.letter_idx] == 46: # - to A
-                    self.ords[self.letter_idx] = 65 # A
-            else:
-                self.letter_idx += 1
-                if self.letter_idx >= 3:
-                    self._submit_inits()
+        try:
+            if self.state == "initials":
+                if channel == PIN_RESET:
+                    self.ords[self.letter_idx] += 1
+                    if self.ords[self.letter_idx] > 90: # Z to A
+                        self.ords[self.letter_idx] = 45 # -
+                    elif self.ords[self.letter_idx] == 46: # - to A
+                        self.ords[self.letter_idx] = 65 # A
+                else:
+                    self.letter_idx += 1
+                    if self.letter_idx >= 3:
+                        self._submit_inits()
+                        return
+            if self.state == "playing":
+                if channel != PIN_RESET:
+                    pts = SWITCH_PINS.get(channel, 0)
+                    self._pending_points.append(pts)
                     return
-        if self.state == "playing":
-            if channel != PIN_RESET:
-                pts = SWITCH_PINS.get(channel, 0)
-                self._pending_points.append(pts)
-                return
-        if self.state != "initials":
-            self._end_game(True)
+            if self.state != "initials":
+                self._end_game(True)
+        except Exception as e:
+            print(f"Error in GPIO callback: {e}")
 
     # ── Game logic ────────────────────────────────────────────────────────────
 
