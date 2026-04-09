@@ -222,7 +222,7 @@ class SkeeBall:
                 scr.blit(fsuf, (20 + panel_w // 2 - fsuf.get_width() // 2, 320 + (PI*100)))
         
         # Balls remaining
-        ball_y = H - 220 - 200
+        ball_y = H - 220 - 100
         ball_label = self.font_large.render("BALLS", True, BALL_LAB_COL)
         ball_r = 35
         ball_y_2 = 2.5 * ball_r + ball_y
