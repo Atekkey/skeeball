@@ -5,7 +5,7 @@ import os
 import time
 
 PI = not ("-NOPI" in sys.argv)
-EOH_MODE = "-EOH" in sys.argv
+EOH = "-EOH" in sys.argv
 
 if PI:
     import RPi.GPIO as GPIO
@@ -35,7 +35,7 @@ try:
 except (IndexError, ValueError):
     pass
 
-HIGH_SCORE_FILE = "highscores.json"
+HIGH_SCORE_FILE = "highscores.json" if not EOH else ""
 # ── Colors ────────────────────────────────────────────────────────────────────
 BG          = (15,  15,  20)
 SURFACE     = (28,  28,  38)
@@ -67,11 +67,15 @@ def setup_gpio(callback):
         print(f"Error setting up GPIO pin: {PIN_RESET}")
 # ── High score persistence ────────────────────────────────────────────────────
 def load_scores():
+    if HIGH_SCORE_FILE == "":
+        return []
     if os.path.exists(HIGH_SCORE_FILE):
         with open(HIGH_SCORE_FILE) as f:
             return json.load(f)
     return []
 def save_scores(scores):
+    if HIGH_SCORE_FILE == "":
+        return
     with open(HIGH_SCORE_FILE, "w") as f:
         json.dump(scores, f)
 
@@ -157,7 +161,7 @@ class SkeeBall:
             self._reset()
             return
         ## END BY 10 balls thrown        
-        if EOH_MODE:
+        if EOH:
             return
         self.high_scores.sort(key=lambda h: h["score"], reverse=True)
         tenth_high = (self.high_scores[min(9, len(self.high_scores)-1)])["score"] # 10th highest
@@ -245,33 +249,34 @@ class SkeeBall:
                 pygame.draw.circle(scr, col, (diff + bx + (i//2) * (ball_r * 2 + ball_spacing), ball_y_2), ball_r)
 
         # Right panel — high scores (skinny)
-        rw = 260
-        rx = W - rw - 20
-        self._draw_rounded_rect(scr, SURFACE2, (rx, 20, rw, H - 40), 16)
+        if not EOH: # IF EOH no high score panel
+            rw = 260
+            rx = W - rw - 20
+            self._draw_rounded_rect(scr, SURFACE2, (rx, 20, rw, H - 40), 16)
 
-        hs_title = self.font_v_small.render("HIGH SCORES", True, GRAY)
-        scr.blit(hs_title, (rx + rw // 2 - hs_title.get_width() // 2, 50))
+            hs_title = self.font_v_small.render("HIGH SCORES", True, GRAY)
+            scr.blit(hs_title, (rx + rw // 2 - hs_title.get_width() // 2, 50))
 
-        pygame.draw.line(scr, DARK_GRAY, (rx + 16, 100), (rx + rw - 16, 100), 1)
+            pygame.draw.line(scr, DARK_GRAY, (rx + 16, 100), (rx + rw - 16, 100), 1)
 
-        for i, entry in enumerate(self.high_scores[:10]):
-            ey = 120 + i * 70
-            if i == 0:
-                rank_col = GOLD
-            elif i == 1:
-                rank_col = SILVER
-            elif i == 2:
-                rank_col = BRONZE
-            else:
-                rank_col = GRAY
-            rank_s = self.font_small.render(str(entry["name"]) + ":", True, rank_col)
-            score_s = self.font_med.render(str(entry["score"]), True, rank_col)
-            scr.blit(rank_s, (rx + 16, ey + 4))
-            scr.blit(score_s, (rx + rw - 16 - score_s.get_width(), ey))
+            for i, entry in enumerate(self.high_scores[:10]):
+                ey = 120 + i * 70
+                if i == 0:
+                    rank_col = GOLD
+                elif i == 1:
+                    rank_col = SILVER
+                elif i == 2:
+                    rank_col = BRONZE
+                else:
+                    rank_col = GRAY
+                rank_s = self.font_small.render(str(entry["name"]) + ":", True, rank_col)
+                score_s = self.font_med.render(str(entry["score"]), True, rank_col)
+                scr.blit(rank_s, (rx + 16, ey + 4))
+                scr.blit(score_s, (rx + rw - 16 - score_s.get_width(), ey))
 
-        if not self.high_scores:
-            empty = self.font_small.render("No scores", True, GRAY)
-            scr.blit(empty, (rx + rw // 2 - empty.get_width() // 2, 180))
+            if not self.high_scores:
+                empty = self.font_small.render("No scores", True, GRAY)
+                scr.blit(empty, (rx + rw // 2 - empty.get_width() // 2, 180))
 
     def _draw_game_over(self):
         scr = self.screen
