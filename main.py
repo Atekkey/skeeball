@@ -207,7 +207,7 @@ class SkeeBall:
         lbl = f.render("SCORE", True, GRAY)
         scr.blit(lbl, (20 + panel_w // 2 - lbl.get_width() // 2, 60))
 
-        # Score number
+        # Score numb
         score_surf = self.font_huge_score.render(str(self.score), True, WHITE)
         scr.blit(score_surf, (20 + panel_w // 2 - score_surf.get_width() // 2, 120))
 
