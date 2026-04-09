@@ -23,3 +23,6 @@ nano /home/triangle/.config/autostart/skeeball.desktop
     Exec=cd /home/triangle/skeeball && git pull && python /home/triangle/skeeball/main.py 9
     ###
 ### END
+
+Todo: try:
+Exec=lxterminal -e bash -c "cd /home/triangle/skeeball && python main.py 9; bash"
