@@ -219,11 +219,11 @@ class SkeeBall:
                 alpha = max(0, 255 - int(255 * age / 1000))
                 fsuf = self.font_huge.render(f"+{pts}", True, GREEN)
                 fsuf.set_alpha(alpha)
-                scr.blit(fsuf, (20 + panel_w // 2 - fsuf.get_width() // 2, 420))
+                scr.blit(fsuf, (20 + panel_w // 2 - fsuf.get_width() // 2, 320 + (PI*100)))
         
         # Balls remaining
-        ball_y = H - 220
-        ball_label = self.font_med.render("BALLS", True, BALL_LAB_COL)
+        ball_y = H - 220 + 100
+        ball_label = self.font_large.render("BALLS", True, BALL_LAB_COL)
         ball_r = 35
         ball_y_2 = 2.5 * ball_r + ball_y
         scr.blit(ball_label, (20 + panel_w // 2 - ball_label.get_width() // 2, ball_y - 140))
